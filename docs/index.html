@@ -1,0 +1,123 @@
+# the single page app (includes CSS & JS below)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Machine‑Learning Pipeline Explorer</title>
+
+  <!-- ① Vis‑Network CDN (renders the graph) -->
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <!-- ② Minimal styling -->
+  <style>
+    :root {
+      --bg: #111418;
+      --fg: #e8e8e8;
+      --accent: #3b82f6;
+      --panel-bg: #1e1e23;
+      --panel-w: 340px;
+      --steps: 
+        #60a5fa, /* 1 */
+        #38bdf8, /* 2 */
+        #22d3ee, /* 3 */
+        #34d399, /* 4 */
+        #a3e635, /* 5 */
+        #facc15, /* 6 */
+        #f97316, /* 7 */
+        #f43f5e; /* 8 */
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,Segoe UI,Roboto,sans-serif;overflow:hidden;}
+    #mynetwork{width:100%;height:100%;}
+    /* ── slide‑in sidebar ─────────────────────────────────────────┐ */
+    #sidebar{
+      position:fixed;top:0;right:-var(--panel-w);width:var(--panel-w);height:100%;
+      background:var(--panel-bg);padding:1rem 1.25rem;box-shadow:-2px 0 8px #0006;
+      overflow-y:auto;transition:right .35s cubic-bezier(.25,.1,.25,1);
+    }
+    #sidebar.open{right:0;}
+    #sidebar h2{margin-top:0;}
+    #closeBtn{all:unset;float:right;font-size:1.5rem;cursor:pointer;color:var(--fg);}
+    a{color:var(--accent);}
+    pre{background:#0004;padding:.75rem;border-radius:.5rem;overflow-x:auto;}
+  </style>
+</head>
+<body>
+  <div id="mynetwork"></div>
+
+  <!-- ── sidebar ───────────────────────────── -->
+  <aside id="sidebar">
+    <span id="closeBtn" title="Close">×</span>
+    <div id="content"><!-- populated dynamically --></div>
+  </aside>
+
+  <!-- ③ Graph + interactivity -->
+  <script>
+  /************* 1.  Pipeline metadata (edit here or load JSON) *************/
+  const steps = [
+    {id: 1, label: "1 · Data Acquisition",     colorIndex: 0,
+      desc: `Collect raw data from multiple sources (DB dumps, APIs, web‑scraping, sensors, …).  
+**Potential issues:** access rate limits, inconsistent formats, missing fields.  
+**Diagnosis tools:** data profiler, schema validator.  
+**Resolutions:** caching layer, schema inference, automated retries.`,
+      links: [
+        {text:"Article – Best Practices for Data Ingestion", url:"https://example.com/ingestion"}
+      ],
+      code: `# Example: incremental dump via Airbyte\nairbyte run --connection-id XXXXX`
+    },
+    {id: 2, label: "2 · Data Pre‑processing",  colorIndex: 1,
+      desc:"…",  links:[], code:""},
+    {id: 3, label: "3 · Feature Engineering",  colorIndex: 2, desc:"…"},
+    {id: 4, label: "4 · Model Selection",      colorIndex: 3, desc:"…"},
+    {id: 5, label: "5 · Training",             colorIndex: 4, desc:"…"},
+    {id: 6, label: "6 · Evaluation",           colorIndex: 5, desc:"…"},
+    {id: 7, label: "7 · Testing",              colorIndex: 6, desc:"…"},
+    {id: 8, label: "8 · Perf Comparison",      colorIndex: 7, desc:"…"}
+  ];
+
+  const edges = steps.slice(0,-1).map(s => ({from:s.id, to:s.id+1, arrows:'to'}));
+
+  /************* 2.  Build network *************/
+  const nodeColors = getComputedStyle(document.documentElement)
+                    .getPropertyValue('--steps').split(',').map(c=>c.trim());
+  const nodes = new vis.DataSet(
+    steps.map(s => ({
+      id:s.id, label:s.label, font:{multi:true},
+      color:{background:nodeColors[s.colorIndex], border:"#fff"},
+      borderWidth:2, shape:"box", margin:10
+    }))
+  );
+  const network = new vis.Network(
+    document.getElementById("mynetwork"),
+    {nodes, edges:new vis.DataSet(edges)},
+    {
+      layout:{hierarchical:{direction:"LR",levelSeparation:160,nodeSpacing:200}},
+      physics:false,
+      interaction:{hover:true}
+    }
+  );
+
+  /************* 3.  Sidebar behaviour *************/
+  const sidebar   = document.getElementById("sidebar");
+  const closeBtn  = document.getElementById("closeBtn");
+  const contentEl = document.getElementById("content");
+
+  network.on("click", params => {
+    if (!params.nodes.length) return;
+    const step = steps.find(s=>s.id===params.nodes[0]);
+    if(!step) return;
+    sidebar.classList.add("open");
+    contentEl.innerHTML = `
+      <h2>${step.label}</h2>
+      <p>${marked.parse(step.desc || "*Coming soon*")}</p>
+      ${step.code ? `<h3>Code Snippet</h3><pre><code>${step.code}</code></pre>`:''}
+      ${step.links?.length ? `<h3>Articles</h3><ul>${step.links.map(l=>`<li><a href="${l.url}" target="_blank">${l.text}</a></li>`).join('')}</ul>`:''}
+    `;
+  });
+  closeBtn.onclick = () => sidebar.classList.remove("open");
+  </script>
+
+  <!-- ④ Optional: Markdown to HTML converter for rich formatting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
