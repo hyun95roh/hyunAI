@@ -1,0 +1,81 @@
+:root {
+    --bg: #111418;
+    --fg: #e8e8e8;
+    --accent: #3b82f6;
+    --panel-bg: #1e1e23;
+    --panel-w: 340px;
+    --steps: 
+      #60a5fa, #38bdf8, #22d3ee, #34d399,
+      #a3e635, #facc15, #f97316, #f43f5e;
+  }
+  
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, Segoe UI, Roboto, sans-serif;
+    overflow: hidden;
+  }
+  
+  #mynetwork {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* ─── Sidebar ─────────────────────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: var(--panel-w);
+    background: var(--panel-bg);
+    transform: translateX(100%);
+    transition: transform 0.4s ease-in-out;
+    padding: 1rem 1.25rem;
+    box-shadow: -2px 0 8px #0006;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+  
+  #toggleBtn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1100;
+    font-size: 1.5rem;
+    color: var(--fg);
+    background: #0006;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem;
+    cursor: pointer;
+  }  
+  
+  #sidebar h2 {
+    margin-top: 0;
+  }
+  
+  #closeBtn {
+    all: unset;
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--fg);
+  }
+  
+  a {
+    color: var(--accent);
+  }
+  
+  pre {
+    background: #0004;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+  }
+  
