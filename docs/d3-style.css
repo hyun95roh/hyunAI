@@ -100,16 +100,15 @@ body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 320px;
     height: 100%;
+    width: 320px;
     background: #1e1e23;
     color: #eee;
     padding: 1rem;
     box-shadow: 3px 0 10px #0007;
     z-index: 11;
     overflow: auto;
-    transition: transform 0.3s ease;
-    transform: translateX(0);
+    transition: width 0.3s ease, transform 0.3s ease;
   }
   #left-sidebar.closed {
     transform: translateX(-100%);
@@ -141,7 +140,7 @@ body {
     position: fixed;
     top: 1rem;
     left: 320px;
-    z-index: 20;
+    z-index: 12;
     background: #0008;
     color: white;
     border: none;
@@ -151,18 +150,18 @@ body {
     cursor: pointer;
     transition: left 0.3s ease;
   }
-  #left-sidebar.closed + #leftToggleBtn {
-    left: 0;
+  #left-sidebar.closed ~ #leftToggleBtn {
+    left: 0; /* slide with sidebar */
   }
   #leftResizer {
     position: absolute;
-    right: 0;
     top: 0;
+    right: 0;
     width: 6px;
     height: 100%;
     background: #444;
     cursor: ew-resize;
-  }    
+  }
 
   #searchBox {
     width: 100%;

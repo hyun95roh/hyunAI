@@ -208,32 +208,31 @@ document.addEventListener("mouseup", () => {
 // Resizable left sidebar
 const leftSidebar = document.getElementById("left-sidebar");
 const leftResizer = document.getElementById("leftResizer");
+const leftToggleBtn = document.getElementById("leftToggleBtn");
 let isLeftResizing = false;
 
-// Left sidebar toggle button
-document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
-  leftSidebar.classList.toggle("closed");
-});
+
 // Close button for left sidebar
 document.getElementById("leftToggleBtn").onclick = () => {
     leftSidebar.classList.toggle("closed");
   };
   
-// Sidebar Resize
+// Resizing
 leftResizer.addEventListener("mousedown", e => {
-isLeftResizing = true;
-document.body.style.cursor = "ew-resize";
+  isLeftResizing = true;
+  document.body.style.cursor = "ew-resize";
 });
 
 document.addEventListener("mousemove", e => {
-if (!isLeftResizing) return;
-const newWidth = e.clientX;
-leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+  if (!isLeftResizing || leftSidebar.classList.contains("closed")) return;
+  const newWidth = e.clientX;
+  leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+  leftToggleBtn.style.left = `${Math.max(newWidth, 200)}px`;
 });
 
 document.addEventListener("mouseup", () => {
-isLeftResizing = false;
-document.body.style.cursor = "";
+  isLeftResizing = false;
+  document.body.style.cursor = "";
 });
 
 
