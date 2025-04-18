@@ -68,10 +68,23 @@
     color: var(--fg);
   }
   #left-sidebar {
+    position: fixed;
+    top: 0;
     left: 0;
     width: 320px;
-    transition: left 0.4s ease;
+    height: 100%;
+    background: #1e1e23;
+    color: #eee;
+    padding: 1rem;
+    box-shadow: 3px 0 10px #0007;
+    z-index: 11;
+    overflow: auto;
+    transition: left 0.3s ease;
     box-sizing: border-box;
+  }
+  
+  #left-sidebar.closed {
+    left: -340px;
   }
   
   #leftResizer {
@@ -84,9 +97,19 @@
     cursor: ew-resize;
   }
   
-  #left-sidebar.closed {
-    left: -320px;
-  }  
+  #leftToggleBtn {
+    position: absolute;
+    top: 10px;
+    right: -28px;
+    z-index: 15;
+    padding: 6px 10px;
+    background: #3b82f6;
+    color: white;
+    font-size: 18px;
+    border-radius: 0 6px 6px 0;
+    border: none;
+    cursor: pointer;
+  }    
 
   a {
     color: var(--accent);

@@ -210,21 +210,29 @@ const leftSidebar = document.getElementById("left-sidebar");
 const leftResizer = document.getElementById("leftResizer");
 let isLeftResizing = false;
 
+// Sidebar Collapse
+document.getElementById("leftToggleBtn").onclick = () => {
+    leftSidebar.classList.toggle("closed");
+  };
+  
+// Sidebar Resize
 leftResizer.addEventListener("mousedown", e => {
-  isLeftResizing = true;
-  document.body.style.cursor = "ew-resize";
+isLeftResizing = true;
+document.body.style.cursor = "ew-resize";
 });
 
 document.addEventListener("mousemove", e => {
-  if (!isLeftResizing) return;
-  const newWidth = e.clientX;
-  leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+if (!isLeftResizing) return;
+const newWidth = e.clientX;
+leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
 });
 
 document.addEventListener("mouseup", () => {
-  isLeftResizing = false;
-  document.body.style.cursor = "";
+isLeftResizing = false;
+document.body.style.cursor = "";
 });
+  
+
 
 // Optional hide/show toggle
 document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
@@ -236,11 +244,12 @@ document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
 document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
     btn.onclick = () => {
       document.querySelectorAll("#left-sidebar .tab").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
+      document.querySelectorAll("#left-sidebar .tab-content").forEach(t => t.classList.add("hidden"));
       btn.classList.add("active");
       document.getElementById(`${btn.dataset.tab}-tab`).classList.remove("hidden");
     };
   });
+  
 
 // Search functionality - Filter nodes based on input
 document.getElementById("searchBox").addEventListener("input", e => {
