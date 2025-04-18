@@ -24,7 +24,8 @@ function initGraph(stepsData) {
     .attr("d", "M0,-5L10,0L0,5")
     .attr("fill", "#999");
 
-  let nodes = [...stepsData]; // only main nodes initially
+  let nodes = stepsData.map(d => ({ ...d, depth: 0 }));
+  // only main nodes initially
   let links = stepsData.slice(0, -1).map((d, i) => ({
     source: d.id,
     target: stepsData[i + 1].id
@@ -51,9 +52,13 @@ function initGraph(stepsData) {
       enter => {
         const g = enter.append("g").attr("class", "node").call(drag(simulation));
 
+
+        const colorByDepth = d3.scaleOrdinal()
+            .domain([0, 1, 2])
+            .range(["#3b82f6", "#9333ea", "#ec4899"]);
         g.append("circle")
           .attr("r", 24)
-          .attr("fill", "#3b82f6")
+          .attr("fill", d => colorByDepth(d.depth ?? 0))
           .attr("stroke", "#fff")
           .attr("stroke-width", 2)
           .on("click", (_, d) => {
@@ -102,7 +107,7 @@ function initGraph(stepsData) {
       parentNode._expanded = false;
     } else {
       // Expand
-      const newNodes = parentNode.children;
+      const newNodes = parentNode.children.map(child => ({ ...child, depth: 1 }));
       const newLinks = newNodes.map(child => ({
         source: parentNode.id,
         target: child.id
