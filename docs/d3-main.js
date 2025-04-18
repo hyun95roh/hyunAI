@@ -155,6 +155,7 @@ let isResizing = false;
 let isResizingLeft = false;
 
 resizer.addEventListener("mousedown", () => {
+  sidebar.style.transition = "none";
   isResizing = true;
   document.body.style.cursor = "ew-resize";
   document.body.style.userSelect = "none";
@@ -186,6 +187,7 @@ document.addEventListener("mouseup", () => {
     isResizingLeft = false;
     document.body.style.cursor = "";
     document.body.style.userSelect = "";
+  sidebar.style.transition = "";
   }
 });
 
