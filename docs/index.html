@@ -11,11 +11,35 @@
   <div id="mynetwork"></div>
   <!-- Toggle Button -->
   <button id="toggleBtn">☰</button>
-
+  <!-- Right Sidebar -->
   <aside id="sidebar">
     <span id="closeBtn" title="Close">×</span>
     <div id="content"></div>
   </aside>
+
+  <!-- 🔍 + 🤖 LEFT SIDEBAR -->
+  <aside id="left-sidebar">
+    <div class="tabs">
+      <button class="tab active" data-tab="search">🔍 Search</button>
+      <button class="tab" data-tab="chat">🤖 Llama-4</button>
+    </div>
+
+    <div id="search-tab" class="tab-content">
+      <input type="text" id="searchBox" placeholder="Search nodes..." />
+      <div id="searchResults"></div>
+    </div>
+
+    <div id="chat-tab" class="tab-content hidden">
+      <p>Chat with GPT about ML pipelines:</p>
+      <textarea id="chatInput" placeholder="Ask a question..."></textarea>
+      <button id="chatSend">Ask GPT</button>
+      <div id="chatResponse"></div>
+    </div>
+    <div id="leftResizer"></div>
+
+  </aside>
+
+
 
   <script src="main.js"></script>
 </body>

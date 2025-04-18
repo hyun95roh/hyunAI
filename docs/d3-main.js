@@ -155,6 +155,7 @@ function drag(simulation) {
 }
 
 // Sidebar: auto-show on node click
+const sidebar = document.getElementById("sidebar");
 function showSidebar(d) {
     const content = document.getElementById("content");
     sidebar.classList.remove("closed");  // ⬅️ Always open when a node is clicked
@@ -170,7 +171,6 @@ function showSidebar(d) {
   }
 
 // Sidebar: toggle visibility
-const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
 const closeBtn = document.getElementById("closeBtn");
 toggleBtn.onclick = () => {
@@ -181,7 +181,7 @@ closeBtn.onclick = () => {
 sidebar.classList.add("closed");     // ⬅️ Force hide
 };
 
-// Resizable sidebar
+// Resizable right sidebar
 const resizer = document.getElementById("resizer");
 let isResizing = false;
 
@@ -204,6 +204,33 @@ document.addEventListener("mouseup", () => {
     document.body.style.userSelect = "";
   }
 });
+
+// Resizable left sidebar
+const leftSidebar = document.getElementById("left-sidebar");
+const leftResizer = document.getElementById("leftResizer");
+let isLeftResizing = false;
+
+leftResizer.addEventListener("mousedown", e => {
+  isLeftResizing = true;
+  document.body.style.cursor = "ew-resize";
+});
+
+document.addEventListener("mousemove", e => {
+  if (!isLeftResizing) return;
+  const newWidth = e.clientX;
+  leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+});
+
+document.addEventListener("mouseup", () => {
+  isLeftResizing = false;
+  document.body.style.cursor = "";
+});
+
+// Optional hide/show toggle
+document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
+  leftSidebar.classList.toggle("closed");
+});
+
 
 // TAB SWITCHING (left sidebar)
 document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
@@ -232,15 +259,32 @@ if (e.target.classList.contains("result")) {
 });
 
 // Chat functionality
-document.getElementById("chatSend").onclick = () => {
-    const input = document.getElementById("chatInput").value.trim();
-    const out = document.getElementById("chatResponse");
-    if (!input) return;
-    out.innerHTML = `<em>Thinking...</em>`;
+const historyEl = document.getElementById("chatHistory");
+
+document.getElementById("chatSend").onclick = async () => {
+  const input = document.getElementById("chatInput").value.trim();
+  const out = document.getElementById("chatResponse");
+  if (!input) return;
+
+  historyEl.innerHTML += `<div class="chat-user">🧑‍💻 <strong>You:</strong> ${input}</div>`;
+  out.innerHTML = `<em>Thinking...</em>`;
+  document.getElementById("chatInput").value = "";
+
+  try {
+    const res = await fetch("https://hyunai.onrender.com/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: input })
+    });
+    const data = await res.json();
+    out.innerHTML = "";  // Clear final output box
+    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>GPT:</strong> ${marked.parse(data.reply)}</div>`;
+  } catch (err) {
+    out.innerHTML = `<span style="color:red">❌ Chat failed</span>`;
+  }
+
+  historyEl.scrollTop = historyEl.scrollHeight;
+};
+
   
-    // TODO: replace with actual API
-    setTimeout(() => {
-      out.innerHTML = `🔮 <strong>GPT:</strong> Great question! Here's how you might approach:<br><br><code>${input}</code>`;
-    }, 800);
-  };
   

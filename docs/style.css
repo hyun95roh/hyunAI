@@ -67,7 +67,27 @@
     cursor: pointer;
     color: var(--fg);
   }
+  #left-sidebar {
+    left: 0;
+    width: 320px;
+    transition: left 0.4s ease;
+    box-sizing: border-box;
+  }
   
+  #leftResizer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background: #444;
+    cursor: ew-resize;
+  }
+  
+  #left-sidebar.closed {
+    left: -320px;
+  }  
+
   a {
     color: var(--accent);
   }
@@ -77,5 +97,20 @@
     padding: 0.75rem;
     border-radius: 0.5rem;
     overflow-x: auto;
+  }
+  #chatHistory {
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #2a2a2e;
+    border-radius: 6px;
+  }
+  .chat-user, .chat-bot {
+    margin-bottom: 0.75rem;
+  }
+  .chat-user strong, .chat-bot strong {
+    color: #60a5fa;
   }
   
