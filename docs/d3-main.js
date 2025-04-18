@@ -322,11 +322,13 @@ async function sendChatMessage() {
   }
 }
 
-document.getElementById("chatSend").onclick = sendChatMessage;
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("chatSend").onclick = sendChatMessage;
 
-document.getElementById("chatInput").addEventListener("keydown", e => {
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault(); // prevent newline
-    sendChatMessage();  // send message
-  }
+  document.getElementById("chatInput").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // prevent newline
+      sendChatMessage();  // send message
+    }
+  });
 });
