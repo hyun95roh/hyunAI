@@ -1,0 +1,54 @@
+{
+    "steps": [
+      {
+        "id": 1,
+        "label": "1 · Data Acquisition",
+        "colorIndex": 0,
+        "desc": "Collect raw data from multiple sources (DB dumps, APIs, web-scraping, sensors, …).\n\n**Potential issues:** access rate limits, inconsistent formats, missing fields.\n**Diagnosis tools:** data profiler, schema validator.\n**Resolutions:** caching layer, schema inference, automated retries.",
+        "links": [
+          {
+            "text": "Article – Best Practices for Data Ingestion",
+            "url": "https://example.com/ingestion"
+          }
+        ],
+        "code": "# Example: incremental dump via Airbyte\\nairbyte run --connection-id XXXXX"
+      },
+      {
+        "id": 2,
+        "label": "2 · Data Pre-processing",
+        "colorIndex": 1,
+        "desc": "Clean, transform, and normalize input data."
+      },
+      {
+        "id": 3,
+        "label": "3 · Feature Engineering",
+        "colorIndex": 2,
+        "desc": "…"
+      },
+      {
+        "id": 4,
+        "label": "4 · Model Selection",
+        "colorIndex": 3,
+        "desc": "Train the model using the prepared data."
+      },
+      {
+        "id": 5,
+        "label": "5 · Model Training and Evaluation",
+        "colorIndex": 4,
+        "desc": "Train your model then evaluate the model performance using metrics like accuracy, precision, recall, etc."
+      },
+      {
+        "id": 6,
+        "label": "6 · Testing & Deployment",
+        "colorIndex": 5,
+        "desc": "Deploy the trained model to a production environment."
+      },
+      {
+        "id": 7,
+        "label": "7 · Monitoring & Maintenance",
+        "colorIndex": 6,
+        "desc": "Monitor the model performance and retrain if necessary."
+      }
+    ]
+  }
+  

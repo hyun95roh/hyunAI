@@ -1,29 +1,17 @@
-/************* 1. Step metadata *************/
-const steps = [
-    {
-      id: 1, label: "1 · Data Acquisition", colorIndex: 0,
-      desc: `Collect raw data from multiple sources (DB dumps, APIs, web-scraping, sensors, …).
-  
-  **Potential issues:** access rate limits, inconsistent formats, missing fields.  
-  **Diagnosis tools:** data profiler, schema validator.  
-  **Resolutions:** caching layer, schema inference, automated retries.`,
-      links: [
-        { text: "Article – Best Practices for Data Ingestion", url: "https://example.com/ingestion" }
-      ],
-      code: `# Example: incremental dump via Airbyte\nairbyte run --connection-id XXXXX`
-    },
-    { id: 2, label: "2 · Data Pre-processing", colorIndex: 1, desc: "…" },
-    { id: 3, label: "3 · Feature Engineering", colorIndex: 2, desc: "…" },
-    { id: 4, label: "4 · Model Selection", colorIndex: 3, desc: "…" },
-    { id: 5, label: "5 · Training", colorIndex: 4, desc: "…" },
-    { id: 6, label: "6 · Evaluation", colorIndex: 5, desc: "…" },
-    { id: 7, label: "7 · Testing", colorIndex: 6, desc: "…" },
-    { id: 8, label: "8 · Perf Comparison", colorIndex: 7, desc: "…" }
-  ];
-  
-  const edges = steps.slice(0, -1).map(s => ({ from: s.id, to: s.id + 1, arrows: 'to' }));
-  
-  /************* 2. Build and render network *************/
+/************* 1. Load graph data from pipeline.json *************/
+fetch('data/pipeline.json')
+  .then(res => res.json())
+  .then(data => {
+    const steps = data.steps;
+    const edges = steps.slice(0, -1).map(s => ({ from: s.id, to: s.id + 1, arrows: 'to' }));
+    renderGraph(steps, edges);  // ⬅️ Now use a function to build graph and sidebar
+  })
+  .catch(err => console.error("Error loading pipeline.json:", err));
+
+
+/************* 2. Build and render network *************/
+function renderGraph(steps, edges) {
+  /************* 2.1 Build and render network *************/
   const nodeColors = getComputedStyle(document.documentElement)
     .getPropertyValue('--steps').split(',').map(c => c.trim());
   
@@ -55,7 +43,7 @@ const steps = [
     }
   );
   
-  /************* 3. Sidebar interaction *************/
+  /************* 2.2 Sidebar interaction *************/
   const sidebar = document.getElementById("sidebar");
   const closeBtn = document.getElementById("closeBtn");
   const contentEl = document.getElementById("content");
@@ -98,7 +86,7 @@ const steps = [
     if (e.key === "Escape") sidebar.classList.remove("open");
   });
   
-  /************* 4. Hash-based routing for step deep-links *************/
+  /************* 2.3 Hash-based routing for step deep-links *************/
   function handleHashChange() {
     const stepId = parseInt(location.hash.replace('#step', ''));
     if (isNaN(stepId)) return;
@@ -107,4 +95,5 @@ const steps = [
   }
   window.addEventListener("hashchange", handleHashChange);
   window.dispatchEvent(new Event("hashchange")); // support initial deep link
-  
+
+}
