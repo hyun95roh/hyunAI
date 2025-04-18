@@ -28,6 +28,8 @@ function initGraph(stepsData) {
     .attr("fill", "#999");
 
   let nodes = stepsData.map(d => ({ ...d, depth: 0 }));
+  window.allNodes = stepsData.flatMap(d => [d, ...(d.children || [])]);
+
   // only main nodes initially
   let links = stepsData.slice(0, -1).map((d, i) => ({
     source: d.id,
@@ -133,6 +135,7 @@ function initGraph(stepsData) {
   }  
 }
 
+// Drag behavior for nodes
 function drag(simulation) {
   return d3.drag()
     .on("start", (event, d) => {
@@ -201,3 +204,43 @@ document.addEventListener("mouseup", () => {
     document.body.style.userSelect = "";
   }
 });
+
+// TAB SWITCHING (left sidebar)
+document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll("#left-sidebar .tab").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
+      btn.classList.add("active");
+      document.getElementById(`${btn.dataset.tab}-tab`).classList.remove("hidden");
+    };
+  });
+
+// Search functionality
+document.getElementById("searchBox").addEventListener("input", e => {
+const query = e.target.value.toLowerCase();
+const matches = window.allNodes.filter(n => n.label?.toLowerCase().includes(query)).slice(0, 10);
+const resultBox = document.getElementById("searchResults");
+resultBox.innerHTML = matches.map(m => `<div class="result" data-id="${m.id}">${m.label}</div>`).join("") || "<em>No results</em>";
+});
+
+document.getElementById("searchResults").addEventListener("click", e => {
+if (e.target.classList.contains("result")) {
+    const id = e.target.dataset.id;
+    const targetNode = window.allNodes.find(n => n.id == id);
+    if (targetNode) showSidebar(targetNode);
+}
+});
+
+// Chat functionality
+document.getElementById("chatSend").onclick = () => {
+    const input = document.getElementById("chatInput").value.trim();
+    const out = document.getElementById("chatResponse");
+    if (!input) return;
+    out.innerHTML = `<em>Thinking...</em>`;
+  
+    // TODO: replace with actual API
+    setTimeout(() => {
+      out.innerHTML = `🔮 <strong>GPT:</strong> Great question! Here's how you might approach:<br><br><code>${input}</code>`;
+    }, 800);
+  };
+  
