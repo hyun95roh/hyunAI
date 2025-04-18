@@ -108,6 +108,7 @@ body {
     box-shadow: 3px 0 10px #0007;
     z-index: 11;
     overflow: auto;
+    transform: translateX(0);
     transition: width 0.3s ease, transform 0.3s ease;
   }
   #left-sidebar.closed {
@@ -129,7 +130,7 @@ body {
   }
   
   #left-sidebar .tab.active {
-    background: #09a05c;
+    background: #ccc907;
   }
   
   .tab-content.hidden {
@@ -150,7 +151,7 @@ body {
     cursor: pointer;
     transition: left 0.3s ease;
   }
-  #left-sidebar.closed ~ #leftToggleBtn {
+  #left-sidebar.closed + #leftToggleBtn {
     left: 0; /* slide with sidebar */
   }
   #leftResizer {

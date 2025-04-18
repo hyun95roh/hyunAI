@@ -234,20 +234,21 @@ const leftResizer = document.getElementById("leftResizer");
 let isLeftResizing = false;
 
 
-// Sidebar Collapse
+// Left Sidebar Collapse
 document.getElementById("leftToggleBtn").onclick = () => {
-    leftSidebar.classList.toggle("closed");
-  };
+  leftSidebar.classList.toggle("closed");
+  // Optional: update arrow direction
+  const isClosed = leftSidebar.classList.contains("closed");
+  document.getElementById("leftToggleBtn").textContent = isClosed ? "⮞" : "⮜";
+};
+  
 
 
-
-// Sidebar Resize
+// left sidebar resizer
 leftResizer.addEventListener("mousedown", e => {
 isLeftResizing = true;
 document.body.style.cursor = "ew-resize";
 });
-
-
 
 document.addEventListener("mousemove", e => {
 if (!isLeftResizing) return;
@@ -255,14 +256,10 @@ const newWidth = e.clientX;
 leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
 });
 
-
-
 document.addEventListener("mouseup", () => {
 isLeftResizing = false;
 document.body.style.cursor = "";
 });
-
-
 
 // TAB SWITCHING (left sidebar)
 document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
