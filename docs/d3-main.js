@@ -51,11 +51,11 @@ function initGraph(stepsData) {
   function draw() {
     linkSelection = linkSelection.join("line")
       .attr("marker-end", "url(#arrowhead)");
-  
+
     nodeSelection = nodeSelection.join(
       enter => {
         const g = enter.append("g").attr("class", "node").call(drag(simulation));
-  
+
         g.append("circle")
           .attr("r", 24)
           .attr("stroke", "#fff")
@@ -64,25 +64,25 @@ function initGraph(stepsData) {
             if (d.children) toggleChildren(d);
             showSidebar(d);
           });
-  
+
         g.append("text")
           .attr("y", 40)
           .attr("text-anchor", "middle")
           .attr("fill", "#fff")
           .style("font-size", "12px")
           .text(d => d.label);
-  
+
         return g;
       }
     );
-  
+
     nodeSelection.select("circle")
       .attr("fill", d => colorByDepth(d.depth ?? 0));
-  
+
     simulation.nodes(nodes);
     simulation.force("link").links(links);
     simulation.alpha(1).restart();
-  
+
     simulation.on("tick", () => {
       nodeSelection.attr("transform", d => `translate(${d.x},${d.y})`);
       linkSelection
@@ -95,7 +95,7 @@ function initGraph(stepsData) {
 
   function toggleChildren(parentNode) {
     if (!parentNode.children) return;
-  
+
     if (parentNode._expanded) {
       const childIds = new Set(parentNode.children.map(c => c.id));
       nodes = nodes.filter(n => !childIds.has(n.id));
@@ -144,27 +144,8 @@ function drag(simulation) {
     });
 }
 
-// Sidebar handlers
+// Sidebars, resizers, togglers
 const sidebar = document.getElementById("sidebar");
-function showSidebar(d) {
-  const content = document.getElementById("content");
-  sidebar.classList.remove("closed");
-  content.innerHTML = `
-    <h2>${d.label}</h2>
-    ${marked.parse(d.desc || "*Coming soon*")}
-    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
-    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
-      `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
-    ).join("")}</ul>` : ""}
-  `;
-}
-
-document.getElementById("toggleBtn").onclick = () =>
-  sidebar.classList.toggle("closed");
-document.getElementById("closeBtn").onclick = () =>
-  sidebar.classList.add("closed");
-
-// Resizers and togglers
 const resizer = document.getElementById("resizer");
 const leftSidebar = document.getElementById("left-sidebar");
 const leftResizer = document.getElementById("leftResizer");
@@ -208,83 +189,32 @@ document.addEventListener("mouseup", () => {
   }
 });
 
-leftToggleBtn.addEventListener('click', () => {
-  const isClosed = leftSidebar.classList.toggle('closed');
+leftToggleBtn.addEventListener("click", () => {
+  const isClosed = leftSidebar.classList.toggle("closed");
   if (isClosed) {
-    leftToggleBtn.style.left = '0px';
-    leftToggleBtn.textContent = '⮞';
+    leftToggleBtn.textContent = "⮞";
+    leftToggleBtn.style.left = "0px";
   } else {
     const width = leftSidebar.offsetWidth;
+    leftToggleBtn.textContent = "⮜";
     leftToggleBtn.style.left = `${width}px`;
-    leftToggleBtn.textContent = '⮜';
   }
 });
 
-// Tab logic
-document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll("#left-sidebar .tab").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll("#left-sidebar .tab-content").forEach(t => t.classList.add("hidden"));
-    btn.classList.add("active");
-    document.getElementById(`${btn.dataset.tab}-tab`).classList.remove("hidden");
-  };
-});
+document.getElementById("toggleBtn").onclick = () =>
+  sidebar.classList.toggle("closed");
+document.getElementById("closeBtn").onclick = () =>
+  sidebar.classList.add("closed");
 
-// Search
-window.onload = () => {
-  document.getElementById("searchBox").addEventListener("input", e => {
-    const query = e.target.value.toLowerCase();
-    const keywords = query.split(/\s+/).filter(Boolean);
-    const resultBox = document.getElementById("searchResults");
-
-    const matches = (window.allNodes || []).filter(n => {
-      const label = n.label?.toLowerCase() || "";
-      return keywords.every(kw => label.includes(kw));
-    }).slice(0, 10);
-
-    resultBox.innerHTML = matches.map(m => {
-      let label = m.label;
-      keywords.forEach(kw => {
-        const regex = new RegExp(`(${kw})`, "gi");
-        label = label.replace(regex, "<mark>$1</mark>");
-      });
-      return `<div class="result" data-id="${m.id}">${label}</div>`;
-    }).join("") || "<em>No results</em>";
-  });
-
-  document.getElementById("searchResults").addEventListener("click", e => {
-    if (e.target.classList.contains("result")) {
-      const id = e.target.dataset.id;
-      const targetNode = window.allNodes.find(n => n.id == id);
-      if (targetNode) showSidebar(targetNode);
-    }
-  });
-};
-
-// Chat
-const historyEl = document.getElementById("chatHistory");
-
-document.getElementById("chatSend").onclick = async () => {
-  const input = document.getElementById("chatInput").value.trim();
-  const out = document.getElementById("chatResponse");
-  if (!input) return;
-
-  historyEl.innerHTML += `<div class="chat-user">🧑‍💻 <strong>You:</strong> ${input}</div>`;
-  out.innerHTML = `<em>Thinking...</em>`;
-  document.getElementById("chatInput").value = "";
-
-  try {
-    const res = await fetch("https://hyunai.onrender.com/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input })
-    });
-    const data = await res.json();
-    out.innerHTML = "";
-    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>GPT:</strong> ${marked.parse(data.reply)}</div>`;
-  } catch (err) {
-    out.innerHTML = `<span style="color:red">❌ Chat failed</span>`;
-  }
-
-  historyEl.scrollTop = historyEl.scrollHeight;
-};
+function showSidebar(d) {
+  const content = document.getElementById("content");
+  sidebar.classList.remove("closed");
+  content.innerHTML = `
+    <h2>${d.label}</h2>
+    ${marked.parse(d.desc || "*Coming soon*")}
+    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
+    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
+      `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
+    ).join("")}</ul>` : ""}
+  `;
+}
