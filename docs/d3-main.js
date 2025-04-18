@@ -244,7 +244,7 @@ document.getElementById("leftToggleBtn").onclick = () => {
   if (isClosed) {
     document.getElementById("leftToggleBtn").style.left = "0px"; // Adjust button position
   } else {
-    document.getElementById("leftToggleBtn").style.left = leftSidebar.style.width || "200px"; // Adjust button position
+    document.getElementById("leftToggleBtn").style.left = leftSidebar.style.width || "320px"; // Adjust button position
   }
 };
   

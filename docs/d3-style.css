@@ -108,6 +108,8 @@ body {
     box-shadow: 3px 0 10px #0007;
     z-index: 11;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
     transform: translateX(0);
     transition: width 0.3s ease, transform 0.3s ease;
   }
@@ -181,7 +183,10 @@ body {
     font-weight: bold;
     cursor: pointer;
   }
-  
+  #chatControls{
+    padding-top: 0.75rem;
+    border-top: 1px solid #333;
+  }  
   #chatResponse {
     margin-top: 1rem;
     font-size: 0.95rem;
@@ -197,6 +202,7 @@ body {
     padding: 0.5rem;
     background: #2a2a2e;
     border-radius: 6px;
+    flex-grow: 1; 
   }
   .chat-user, .chat-bot {
     margin-bottom: 0.75rem;
