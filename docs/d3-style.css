@@ -1,0 +1,73 @@
+body {
+    margin: 0;
+    background: #111418;
+    color: #f3f3f3;
+    font-family: system-ui, sans-serif;
+    overflow: hidden;
+  }
+  
+  .node circle {
+    fill: #3b82f6;
+    stroke: white;
+    stroke-width: 2px;
+  }
+  
+  .node text {
+    fill: white;
+    font-size: 13px;
+    text-anchor: middle;
+    pointer-events: none;
+  }
+  
+  .link {
+    fill: none;
+    stroke: #999;
+    stroke-opacity: 0.6;
+    stroke-width: 2px;
+    marker-end: url(#arrowhead);
+  }
+  
+  #sidebar {
+    position: fixed;
+    top: 0;
+    right: -360px;
+    width: 360px;
+    height: 100%;
+    background: #1e1e23;
+    transition: right 0.4s ease;
+    padding: 1rem;
+    overflow-y: auto;
+    box-shadow: -3px 0 10px #0007;
+    z-index: 10;
+  }
+  #sidebar.open {
+    right: 0;
+  }
+  #toggleBtn {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 20;
+    font-size: 1.5rem;
+    background: #0008;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #closeBtn {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  pre {
+    background: #0003;
+    padding: 0.75rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  a {
+    color: #60a5fa;
+  }
+  
