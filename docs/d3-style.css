@@ -26,7 +26,8 @@ body {
     stroke-width: 2px;
     marker-end: url(#arrowhead);
   }
-  
+
+  /* ─── Sidebar ─────────────────────────────────────────────── */
   #sidebar {
     position: fixed;
     top: 0;
@@ -94,6 +95,7 @@ body {
   a {
     color: #60a5fa;
   }
+  /* ─── Left Sidebar ─────────────────────────────────────────────── */
   #left-sidebar {
     position: fixed;
     top: 0;
@@ -106,8 +108,12 @@ body {
     box-shadow: 3px 0 10px #0007;
     z-index: 11;
     overflow: auto;
+    transition: transform 0.3s ease;
+    transform: translateX(0);
   }
-  
+  #left-sidebar.closed {
+    transform: translateX(-100%);
+  }  
   #left-sidebar .tabs {
     display: flex;
     gap: 0.5rem;
@@ -130,13 +136,11 @@ body {
   .tab-content.hidden {
     display: none;
   }
-  #left-sidebar.closed {
-    transform: translateX(-100%);
-  }  
+
   #leftToggleBtn {
     position: fixed;
-    left: 320px;
     top: 1rem;
+    left: 320px;
     z-index: 20;
     background: #0008;
     color: white;
@@ -150,7 +154,16 @@ body {
   #left-sidebar.closed + #leftToggleBtn {
     left: 0;
   }
-    
+  #leftResizer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 6px;
+    height: 100%;
+    background: #444;
+    cursor: ew-resize;
+  }    
+
   #searchBox {
     width: 100%;
     padding: 0.4rem;
@@ -195,4 +208,21 @@ body {
     padding: 0.75rem;
     border-radius: 6px;
   }
-    
+  #chatHistory {
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background: #2a2a2e;
+    border-radius: 6px;
+  }
+  .chat-user, .chat-bot {
+    margin-bottom: 0.75rem;
+  }
+  .chat-user strong, .chat-bot strong {
+    color: #60a5fa;
+  }  
+  .tab-content.hidden {
+    display: none;
+  }
