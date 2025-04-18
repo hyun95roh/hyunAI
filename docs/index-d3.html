@@ -20,30 +20,17 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="d3-main.js"></script>
 
-<!-- LEFT SIDEBAR -->
+<!-- 💬 Left sidebar for Groq Chat -->
 <aside id="left-sidebar">
-  <div class="tabs">
-    <button class="tab active" data-tab="search">🔍 Search</button>
-    <button class="tab" data-tab="chat">🤖 Llama-4</button>
-  </div>
-
-  <div id="search-tab" class="tab-content">
-    <input type="text" id="searchBox" placeholder="Search nodes..." />
-    <div id="searchResults"></div>
-  </div>
-
-  <div id="chat-tab" class="tab-content hidden">
-    <p>Chat with GPT about ML pipelines:</p>
-    <div id="chatHistory"></div>
-    <textarea id="chatInput" placeholder="Ask a question..."></textarea>
-    <button id="chatSend">Ask GPT</button>
-    <div id="chatResponse"></div>
-  </div>
-
+  <h2>🤖 Ask Llama-4 (Groq)</h2>
+  <div id="chatHistory"></div>
+  <textarea id="chatInput" placeholder="Ask anything about ML pipeline..."></textarea>
+  <button id="chatSend">Ask GPT</button>
+  <div id="chatResponse"></div>
   <div id="leftResizer"></div>
 </aside>
 
-<!-- ✅ Put the toggle OUTSIDE the sidebar -->
+<!-- Toggle collapse -->
 <button id="leftToggleBtn">⮜</button>
 
 
