@@ -231,13 +231,6 @@ document.addEventListener("mouseup", () => {
 isLeftResizing = false;
 document.body.style.cursor = "";
 });
-  
-
-
-// Optional hide/show toggle
-document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
-  leftSidebar.classList.toggle("closed");
-});
 
 
 // TAB SWITCHING (left sidebar)
@@ -253,25 +246,25 @@ document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
 
 // Search functionality - Filter nodes based on input
 document.getElementById("searchBox").addEventListener("input", e => {
-const query = e.target.value.toLowerCase();
-const keywords = query.split(/\s+/).filter(Boolean); // split by space
-const matches = window.allNodes.filter(n => {
-  const label = n.label?.toLowerCase() || "";
-  return keywords.every(kw => label.includes(kw));
-}).slice(0, 10);
-const resultBox = document.getElementById("searchResults");
-resultBox.innerHTML = matches.map(m => `<div class="result" data-id="${m.id}">${m.label}</div>`).join("") || "<em>No results</em>";
-});
-
-// Search functionality - Highlight keywords in search results
-resultBox.innerHTML = matches.map(m => {
-    let label = m.label;
-    keywords.forEach(kw => {
-      const regex = new RegExp(`(${kw})`, "gi");
-      label = label.replace(regex, "<mark>$1</mark>");
-    });
-    return `<div class="result" data-id="${m.id}">${label}</div>`;
-  }).join("") || "<em>No results</em>";
+    const query = e.target.value.toLowerCase();
+    const keywords = query.split(/\s+/).filter(Boolean); // split by space
+    const resultBox = document.getElementById("searchResults");
+  
+    const matches = window.allNodes.filter(n => {
+      const label = n.label?.toLowerCase() || "";
+      return keywords.every(kw => label.includes(kw));
+    }).slice(0, 10);
+  
+    resultBox.innerHTML = matches.map(m => {
+      let label = m.label;
+      keywords.forEach(kw => {
+        const regex = new RegExp(`(${kw})`, "gi");
+        label = label.replace(regex, "<mark>$1</mark>"); // Highlight matches
+      });
+      return `<div class="result" data-id="${m.id}">${label}</div>`;
+    }).join("") || "<em>No results</em>";
+  });
+  
   
 // Search functionality - Show node details on click
 document.getElementById("searchResults").addEventListener("click", e => {
