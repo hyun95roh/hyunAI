@@ -150,31 +150,35 @@ function drag(simulation) {
     });
 }
 
+// Sidebar: auto-show on node click
 function showSidebar(d) {
-  const sidebar = document.getElementById("sidebar");
-  const content = document.getElementById("content");
-  sidebar.classList.add("open");
+    const content = document.getElementById("content");
+    sidebar.classList.remove("closed");  // ⬅️ Always open when a node is clicked
+  
+    content.innerHTML = `
+      <h2>${d.label}</h2>
+      ${marked.parse(d.desc || "*Coming soon*")}
+      ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
+      ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
+        `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
+      ).join("")}</ul>` : ""}
+    `;
+  }
 
-  content.innerHTML = `
-    <h2>${d.label}</h2>
-    ${marked.parse(d.desc || "*Coming soon*")}
-    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
-    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
-      `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
-    ).join("")}</ul>` : ""}
-  `;
-}
+// Sidebar: toggle visibility
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggleBtn");
+const closeBtn = document.getElementById("closeBtn");
+toggleBtn.onclick = () => {
+sidebar.classList.toggle("closed");  // ⬅️ Use 'closed' class
+};
 
-document.getElementById("closeBtn").onclick = () =>
-  document.getElementById("sidebar").classList.remove("open");
-
-document.getElementById("toggleBtn").onclick = () =>
-  document.getElementById("sidebar").classList.toggle("open");
+closeBtn.onclick = () => {
+sidebar.classList.add("closed");     // ⬅️ Force hide
+};
 
 // Resizable sidebar
 const resizer = document.getElementById("resizer");
-const sidebar = document.getElementById("sidebar");
-
 let isResizing = false;
 
 resizer.addEventListener("mousedown", e => {
