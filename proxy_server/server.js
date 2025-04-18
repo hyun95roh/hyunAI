@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import { config } from 'dotenv';
-import OpenAI from 'openai';
+import fetch from 'node-fetch'; // if using Node <18
 
-config();  // Loads .env variables
+config(); // load .env
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,28 +12,37 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 app.post('/chat', async (req, res) => {
   const { message } = req.body;
   if (!message) return res.status(400).json({ error: "Missing message" });
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",  // or "gpt-4"
-      messages: [
-        { role: "system", content: "You are a helpful assistant for machine learning pipelines." },
-        { role: "user", content: message }
-      ],
-      temperature: 0.7
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",  // for looking around model choice: https://console.groq.com/docs/models
+        messages: [
+          { role: "system", content: "You are a helpful assistant for machine learning pipelines." },
+          { role: "user", content: message }
+        ],
+        temperature: 0.7
+      })
     });
-    res.json({ reply: completion.choices[0].message.content });
+
+    const data = await groqRes.json();
+    if (data.error) throw new Error(data.error.message);
+    res.json({ reply: data.choices[0].message.content });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "OpenAI API error" });
+    console.error("🔥 Groq API Error:", err.message || err);
+    res.status(500).json({ error: "Groq API call failed" });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Groq proxy server running at http://localhost:${PORT}`);
 });
