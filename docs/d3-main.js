@@ -3,41 +3,53 @@ fetch('data/pipeline.json')
   .then(data => renderGraph(data.steps));
 
 function renderGraph(nodesData) {
-  const svg = d3.select("#graph");
   const width = window.innerWidth;
   const height = window.innerHeight;
 
-  svg.append("defs").append("marker")
-    .attr("id", "arrowhead")
-    .attr("viewBox", "-0 -5 10 10")
-    .attr("refX", 22)
-    .attr("refY", 0)
-    .attr("orient", "auto")
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
-    .attr("xoverflow", "visible")
-    .append("svg:path")
-    .attr("d", "M 0,-5 L 10,0 L 0,5")
-    .attr("fill", "#999");
-
-  const edgesData = nodesData.slice(0, -1).map((d, i) => ({
-    source: d.id,
+  const linksData = nodesData.slice(0, -1).map((node, i) => ({
+    source: node.id,
     target: nodesData[i + 1].id
   }));
 
+  const svg = d3.select("#graph")
+    .attr("viewBox", [0, 0, width, height])
+    .call(d3.zoom().on("zoom", (event) => {
+      svgGroup.attr("transform", event.transform);
+    }));
+
+  const svgGroup = svg.append("g");
+
+  // Arrowhead marker
+  svg.append("defs").append("marker")
+    .attr("id", "arrowhead")
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 25)
+    .attr("refY", 0)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .attr("fill", "#999");
+
+  // Simulation
   const simulation = d3.forceSimulation(nodesData)
-    .force("link", d3.forceLink(edgesData).id(d => d.id).distance(180))
+    .force("link", d3.forceLink(linksData).id(d => d.id).distance(200))
     .force("charge", d3.forceManyBody().strength(-500))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-  const link = svg.append("g")
-    .attr("stroke", "#999")
-    .selectAll("path")
-    .data(edgesData)
-    .join("path")
-    .attr("class", "link");
+  // Links
+  const link = svgGroup.append("g")
+    .attr("stroke", "#aaa")
+    .attr("stroke-width", 2)
+    .selectAll("line")
+    .data(linksData)
+    .join("line")
+    .attr("class", "link")
+    .attr("marker-end", "url(#arrowhead)");
 
-  const node = svg.append("g")
+  // Nodes
+  const node = svgGroup.append("g")
     .selectAll("g")
     .data(nodesData)
     .join("g")
@@ -45,26 +57,30 @@ function renderGraph(nodesData) {
     .call(drag(simulation));
 
   node.append("circle")
-    .attr("r", 20)
+    .attr("r", 24)
+    .attr("fill", "#3b82f6")
+    .attr("stroke", "#fff")
+    .attr("stroke-width", 2)
     .on("click", (_, d) => showSidebar(d));
 
   node.append("text")
-    .attr("dy", 4)
-    .attr("y", 30)
-    .text(d => d.label);
+    .text(d => d.label)
+    .attr("y", 40)
+    .attr("text-anchor", "middle")
+    .attr("fill", "#fff")
+    .style("font-size", "12px");
 
   simulation.on("tick", () => {
     node.attr("transform", d => `translate(${d.x},${d.y})`);
-    link.attr("d", d => {
-      const dx = d.target.x - d.source.x;
-      const dy = d.target.y - d.source.y;
-      const dr = Math.sqrt(dx * dx + dy * dy);
-      return `M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`;
-    });
+    link
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
   });
 }
 
-// Dragging behavior
+// Drag behavior
 function drag(simulation) {
   return d3.drag()
     .on("start", (event, d) => {
@@ -92,14 +108,16 @@ function showSidebar(d) {
   content.innerHTML = `
     <h2>${d.label}</h2>
     ${marked.parse(d.desc || "*Coming soon*")}
-    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ''}
-    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l => `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`).join('')}</ul>` : ''}
+    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
+    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
+      `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
+    ).join("")}</ul>` : ""}
   `;
 }
 
-document.getElementById("closeBtn").onclick = () => {
+// Sidebar toggles
+document.getElementById("closeBtn").onclick = () =>
   document.getElementById("sidebar").classList.remove("open");
-};
-document.getElementById("toggleBtn").onclick = () => {
+
+document.getElementById("toggleBtn").onclick = () =>
   document.getElementById("sidebar").classList.toggle("open");
-};
