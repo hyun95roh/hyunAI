@@ -124,13 +124,33 @@ body {
   }
   
   #left-sidebar .tab.active {
-    background: #3b82f6;
+    background: #09a05c;
   }
   
   .tab-content.hidden {
     display: none;
   }
-  
+  #left-sidebar.closed {
+    transform: translateX(-100%);
+  }  
+  #leftToggleBtn {
+    position: fixed;
+    left: 320px;
+    top: 1rem;
+    z-index: 20;
+    background: #0008;
+    color: white;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: left 0.3s ease;
+  }
+  #left-sidebar.closed + #leftToggleBtn {
+    left: 0;
+  }
+    
   #searchBox {
     width: 100%;
     padding: 0.4rem;

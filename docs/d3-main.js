@@ -210,7 +210,11 @@ const leftSidebar = document.getElementById("left-sidebar");
 const leftResizer = document.getElementById("leftResizer");
 let isLeftResizing = false;
 
-// Sidebar Collapse
+// Left sidebar toggle button
+document.getElementById("leftToggleBtn")?.addEventListener("click", () => {
+  leftSidebar.classList.toggle("closed");
+});
+// Close button for left sidebar
 document.getElementById("leftToggleBtn").onclick = () => {
     leftSidebar.classList.toggle("closed");
   };
@@ -244,36 +248,39 @@ document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
   });
   
 
-// Search functionality - Filter nodes based on input
-document.getElementById("searchBox").addEventListener("input", e => {
+// Search functionality 
+window.onload = () => {
+  document.getElementById("searchBox").addEventListener("input", e => {
     const query = e.target.value.toLowerCase();
-    const keywords = query.split(/\s+/).filter(Boolean); // split by space
+    const keywords = query.split(/\s+/).filter(Boolean);
     const resultBox = document.getElementById("searchResults");
-  
-    const matches = window.allNodes.filter(n => {
+
+    const matches = (window.allNodes || []).filter(n => { //Filter nodes based on input
       const label = n.label?.toLowerCase() || "";
       return keywords.every(kw => label.includes(kw));
     }).slice(0, 10);
-  
+
+    // highlight keywords in results
     resultBox.innerHTML = matches.map(m => {
       let label = m.label;
       keywords.forEach(kw => {
         const regex = new RegExp(`(${kw})`, "gi");
-        label = label.replace(regex, "<mark>$1</mark>"); // Highlight matches
+        label = label.replace(regex, "<mark>$1</mark>");
       });
       return `<div class="result" data-id="${m.id}">${label}</div>`;
     }).join("") || "<em>No results</em>";
   });
-  
-  
-// Search functionality - Show node details on click
-document.getElementById("searchResults").addEventListener("click", e => {
-if (e.target.classList.contains("result")) {
-    const id = e.target.dataset.id;
-    const targetNode = window.allNodes.find(n => n.id == id);
-    if (targetNode) showSidebar(targetNode);
-}
-});
+
+  // Add click event to search results
+  document.getElementById("searchResults").addEventListener("click", e => { 
+    if (e.target.classList.contains("result")) { 
+      const id = e.target.dataset.id;
+      const targetNode = window.allNodes.find(n => n.id == id);
+      if (targetNode) showSidebar(targetNode);
+    }
+  });
+};
+
 
 // Chat functionality - Send message and get response
 const historyEl = document.getElementById("chatHistory");
