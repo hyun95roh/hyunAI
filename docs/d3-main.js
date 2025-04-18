@@ -95,32 +95,29 @@ function initGraph(stepsData) {
     if (parentNode._expanded) {
       // Collapse: remove child nodes & links
       const childIds = new Set(parentNode.children.map(c => c.id));
-  
       nodes = nodes.filter(n => !childIds.has(n.id));
       links = links.filter(l =>
         !childIds.has(typeof l.target === 'object' ? l.target.id : l.target)
       );
-  
       parentNode._expanded = false;
     } else {
-      // Expand again
+      // Expand
       const newNodes = parentNode.children;
       const newLinks = newNodes.map(child => ({
         source: parentNode.id,
         target: child.id
       }));
-  
       nodes.push(...newNodes);
       links.push(...newLinks);
-  
       parentNode._expanded = true;
     }
   
-    // Rebind and redraw
+    // ⬇️ Corrected usage of lKey()
     nodeSelection = nodeGroup.selectAll("g").data(nodes, d => d.id);
-    linkSelection = linkGroup.selectAll("line").data(links, d => `${lKey(l)}`);
+    linkSelection = linkGroup.selectAll("line").data(links, l => lKey(l));
     draw();
   }
+  
   
   // Unique key for link data join
   function lKey(link) {
