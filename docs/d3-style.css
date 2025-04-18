@@ -140,7 +140,7 @@ body {
   #leftToggleBtn {
     position: fixed;
     top: 1rem;
-    left: 320px;
+    left: 320px; /* Initial width of sidebar */
     z-index: 12;
     background: #0008;
     color: white;
@@ -151,9 +151,7 @@ body {
     cursor: pointer;
     transition: left 0.3s ease;
   }
-  #left-sidebar.closed + #leftToggleBtn {
-    left: 0; /* slide with sidebar */
-  }
+
   #leftResizer {
     position: absolute;
     top: 0;

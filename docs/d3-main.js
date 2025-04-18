@@ -240,6 +240,12 @@ document.getElementById("leftToggleBtn").onclick = () => {
   // Optional: update arrow direction
   const isClosed = leftSidebar.classList.contains("closed");
   document.getElementById("leftToggleBtn").textContent = isClosed ? "⮞" : "⮜";
+
+  if (isClosed) {
+    document.getElementById("leftToggleBtn").style.left = "0px"; // Adjust button position
+  } else {
+    document.getElementById("leftToggleBtn").style.left = leftSidebar.style.width || "320px"; // Adjust button position
+  }
 };
   
 
@@ -248,17 +254,25 @@ document.getElementById("leftToggleBtn").onclick = () => {
 leftResizer.addEventListener("mousedown", e => {
 isLeftResizing = true;
 document.body.style.cursor = "ew-resize";
+document.body.style.userSelect = "none";
 });
 
 document.addEventListener("mousemove", e => {
-if (!isLeftResizing) return;
-const newWidth = e.clientX;
-leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+  if (!isLeftResizing) return;
+  const newWidth = e.clientX;
+  leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
+
+  if (!leftSidebar.classList.contains("closed")) {
+    leftSidebar.style.width = `${Math.max(newWidth, 200)}px`; // min width = 200px
+  }
 });
 
 document.addEventListener("mouseup", () => {
-isLeftResizing = false;
-document.body.style.cursor = "";
+  if (isLeftResizing) {
+    isLeftResizing = false;
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  }
 });
 
 // TAB SWITCHING (left sidebar)
