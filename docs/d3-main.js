@@ -242,14 +242,29 @@ document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
     };
   });
 
-// Search functionality
+// Search functionality - Filter nodes based on input
 document.getElementById("searchBox").addEventListener("input", e => {
 const query = e.target.value.toLowerCase();
-const matches = window.allNodes.filter(n => n.label?.toLowerCase().includes(query)).slice(0, 10);
+const keywords = query.split(/\s+/).filter(Boolean); // split by space
+const matches = window.allNodes.filter(n => {
+  const label = n.label?.toLowerCase() || "";
+  return keywords.every(kw => label.includes(kw));
+}).slice(0, 10);
 const resultBox = document.getElementById("searchResults");
 resultBox.innerHTML = matches.map(m => `<div class="result" data-id="${m.id}">${m.label}</div>`).join("") || "<em>No results</em>";
 });
 
+// Search functionality - Highlight keywords in search results
+resultBox.innerHTML = matches.map(m => {
+    let label = m.label;
+    keywords.forEach(kw => {
+      const regex = new RegExp(`(${kw})`, "gi");
+      label = label.replace(regex, "<mark>$1</mark>");
+    });
+    return `<div class="result" data-id="${m.id}">${label}</div>`;
+  }).join("") || "<em>No results</em>";
+  
+// Search functionality - Show node details on click
 document.getElementById("searchResults").addEventListener("click", e => {
 if (e.target.classList.contains("result")) {
     const id = e.target.dataset.id;
@@ -258,7 +273,7 @@ if (e.target.classList.contains("result")) {
 }
 });
 
-// Chat functionality
+// Chat functionality - Send message and get response
 const historyEl = document.getElementById("chatHistory");
 
 document.getElementById("chatSend").onclick = async () => {

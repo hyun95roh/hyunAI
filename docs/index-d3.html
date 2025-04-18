@@ -20,11 +20,11 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="d3-main.js"></script>
 
-  <!-- LEFT SIDEBAR: for search and chatGPT -->
+  <!-- 🔍 + 🤖 LEFT SIDEBAR -->
   <aside id="left-sidebar">
     <div class="tabs">
       <button class="tab active" data-tab="search">🔍 Search</button>
-      <button class="tab" data-tab="chat">🤖 ChatGPT</button>
+      <button class="tab" data-tab="chat">🤖 Llama-4</button>
     </div>
 
     <div id="search-tab" class="tab-content">
@@ -33,12 +33,13 @@
     </div>
 
     <div id="chat-tab" class="tab-content hidden">
-      <p>Chat with Llama-4 about ML pipelines:</p>
-      <div id="chatHistory"></div>
+      <p>Chat with GPT about ML pipelines:</p>
       <textarea id="chatInput" placeholder="Ask a question..."></textarea>
       <button id="chatSend">Ask GPT</button>
       <div id="chatResponse"></div>
     </div>
+    <div id="leftResizer"></div>
+
   </aside>
 
 
