@@ -170,3 +170,29 @@ document.getElementById("closeBtn").onclick = () =>
 
 document.getElementById("toggleBtn").onclick = () =>
   document.getElementById("sidebar").classList.toggle("open");
+
+// Resizable sidebar
+const resizer = document.getElementById("resizer");
+const sidebar = document.getElementById("sidebar");
+
+let isResizing = false;
+
+resizer.addEventListener("mousedown", e => {
+  isResizing = true;
+  document.body.style.cursor = "ew-resize";
+  document.body.style.userSelect = "none";
+});
+
+document.addEventListener("mousemove", e => {
+  if (!isResizing) return;
+  const newWidth = window.innerWidth - e.clientX;
+  sidebar.style.width = `${Math.max(newWidth, 200)}px`; // min width = 200px
+});
+
+document.addEventListener("mouseup", () => {
+  if (isResizing) {
+    isResizing = false;
+    document.body.style.cursor = "";
+    document.body.style.userSelect = "";
+  }
+});

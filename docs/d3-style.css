@@ -30,16 +30,33 @@ body {
   #sidebar {
     position: fixed;
     top: 0;
-    right: -360px;
-    width: 360px;
+    right: 0;
     height: 100%;
+    width: 360px; /* initial width */
     background: #1e1e23;
-    transition: right 0.4s ease;
+    transition: width 0.2s ease;
     padding: 1rem;
+    padding-left: 0; /* allow resizer */
     overflow-y: auto;
     box-shadow: -3px 0 10px #0007;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
   }
+  #resizer {
+    width: 6px;
+    cursor: ew-resize;
+    background: #444;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  
+  #resizer:hover {
+    background: #666;
+  }
+    
   #sidebar.open {
     right: 0;
   }
