@@ -289,15 +289,20 @@ document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
 
 
 // Chat functionality - Send message and get response
-const historyEl = document.getElementById("chatHistory");
-document.getElementById("chatSend").onclick = async () => {
-  const input = document.getElementById("chatInput").value.trim();
+async function sendChatMessage() {
+  const inputEl = document.getElementById("chatInput");
+  const input = inputEl.value.trim();
   const out = document.getElementById("chatResponse");
+  const historyEl = document.getElementById("chatHistory");
+  const sendBtn = document.getElementById("chatSend");
+
   if (!input) return;
 
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Sending...";
   historyEl.innerHTML += `<div class="chat-user">🧑‍💻 <strong>You:</strong> ${input}</div>`;
   out.innerHTML = `<em>Thinking...</em>`;
-  document.getElementById("chatInput").value = "";
+  inputEl.value = "";
 
   try {
     const res = await fetch("https://hyunai.onrender.com/chat", {
@@ -305,14 +310,23 @@ document.getElementById("chatSend").onclick = async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: input })
     });
-
     const data = await res.json();
-    out.innerHTML = "";  // Clear final output box
-    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>GPT:</strong> ${marked.parse(data.reply)}</div>`;
+    out.innerHTML = "";
+    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>Llama-4:</strong> ${marked.parse(data.reply)}</div>`;
   } catch (err) {
     out.innerHTML = `<span style="color:red">❌ Chat failed</span>`;
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = "Ask Llama-4";
+    historyEl.scrollTop = historyEl.scrollHeight;
   }
+}
 
-  historyEl.scrollTop = historyEl.scrollHeight;
+document.getElementById("chatSend").onclick = sendChatMessage;
 
-};
+document.getElementById("chatInput").addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault(); // prevent newline
+    sendChatMessage();  // send message
+  }
+});
