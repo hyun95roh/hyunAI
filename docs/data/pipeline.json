@@ -11,13 +11,40 @@
             "url": "https://example.com/ingestion"
           }
         ],
-        "code": "# Example: incremental dump via Airbyte\\nairbyte run --connection-id XXXXX"
+        "code": "# Example: incremental dump via Airbyte\\nairbyte run --connection-id XXXXX",
+        "children": [
+            {
+              "id": "1a",
+              "label": "Web Scraping",
+              "desc": "Subnode desc...",
+              "code": "requests.get(...)"
+            },
+            {
+              "id": "1b",
+              "label": "API Collection",
+              "desc": "API ingestion..."
+            }
+          ]
       },
       {
         "id": 2,
         "label": "2 · Data Pre-processing",
         "colorIndex": 1,
-        "desc": "Clean, transform, and normalize input data."
+        "desc": "Clean, transform, and normalize input data.",
+        "children": [
+            {
+              "id": "2a",
+              "label": "Normalization",
+              "desc": "...",
+              "code": "sklearn.preprocessing.StandardScaler(), sklearn.preprocessing.MinMaxScaler()"
+            },
+            {
+              "id": "2b",
+              "label": "Data Cleaning",
+              "desc": "...",
+              "code": "pandas.DataFrame.dropna(), pandas.DataFrame.fillna(), pandas.DataFrame.drop_duplicates(), ,numpy.nan_to_num(), numpy.isfinite()"
+            }
+          ]
       },
       {
         "id": 3,

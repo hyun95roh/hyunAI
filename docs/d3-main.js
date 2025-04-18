@@ -1,29 +1,21 @@
 fetch('data/pipeline.json')
   .then(res => res.json())
-  .then(data => renderGraph(data.steps));
+  .then(data => initGraph(data.steps));
 
-function renderGraph(nodesData) {
+function initGraph(stepsData) {
   const width = window.innerWidth;
   const height = window.innerHeight;
 
-  const linksData = nodesData.slice(0, -1).map((node, i) => ({
-    source: node.id,
-    target: nodesData[i + 1].id
-  }));
-
   const svg = d3.select("#graph")
     .attr("viewBox", [0, 0, width, height])
-    .call(d3.zoom().on("zoom", (event) => {
-      svgGroup.attr("transform", event.transform);
-    }));
+    .call(d3.zoom().on("zoom", e => svgGroup.attr("transform", e.transform)));
 
   const svgGroup = svg.append("g");
 
-  // Arrowhead marker
   svg.append("defs").append("marker")
     .attr("id", "arrowhead")
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 25)
+    .attr("refX", 24)
     .attr("refY", 0)
     .attr("markerWidth", 6)
     .attr("markerHeight", 6)
@@ -32,55 +24,89 @@ function renderGraph(nodesData) {
     .attr("d", "M0,-5L10,0L0,5")
     .attr("fill", "#999");
 
-  // Simulation
-  const simulation = d3.forceSimulation(nodesData)
-    .force("link", d3.forceLink(linksData).id(d => d.id).distance(200))
-    .force("charge", d3.forceManyBody().strength(-500))
+  let nodes = [...stepsData]; // only main nodes initially
+  let links = stepsData.slice(0, -1).map((d, i) => ({
+    source: d.id,
+    target: stepsData[i + 1].id
+  }));
+
+  const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links).id(d => d.id).distance(200))
+    .force("charge", d3.forceManyBody().strength(-400))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
-  // Links
-  const link = svgGroup.append("g")
-    .attr("stroke", "#aaa")
-    .attr("stroke-width", 2)
-    .selectAll("line")
-    .data(linksData)
-    .join("line")
-    .attr("class", "link")
-    .attr("marker-end", "url(#arrowhead)");
+  const linkGroup = svgGroup.append("g").attr("stroke", "#aaa").attr("stroke-width", 2);
+  const nodeGroup = svgGroup.append("g");
 
-  // Nodes
-  const node = svgGroup.append("g")
-    .selectAll("g")
-    .data(nodesData)
-    .join("g")
-    .attr("class", "node")
-    .call(drag(simulation));
+  let linkSelection = linkGroup.selectAll("line").data(links, d => `${d.source}-${d.target}`);
+  let nodeSelection = nodeGroup.selectAll("g").data(nodes, d => d.id);
 
-  node.append("circle")
-    .attr("r", 24)
-    .attr("fill", "#3b82f6")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 2)
-    .on("click", (_, d) => showSidebar(d));
+  draw();
 
-  node.append("text")
-    .text(d => d.label)
-    .attr("y", 40)
-    .attr("text-anchor", "middle")
-    .attr("fill", "#fff")
-    .style("font-size", "12px");
+  function draw() {
+    linkSelection = linkSelection.join("line")
+      .attr("marker-end", "url(#arrowhead)");
 
-  simulation.on("tick", () => {
-    node.attr("transform", d => `translate(${d.x},${d.y})`);
-    link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-  });
+    nodeSelection = nodeSelection.join(
+      enter => {
+        const g = enter.append("g").attr("class", "node").call(drag(simulation));
+
+        g.append("circle")
+          .attr("r", 24)
+          .attr("fill", "#3b82f6")
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 2)
+          .on("click", (_, d) => {
+            if (d.children && !d._expanded) {
+              revealChildren(d);
+            }
+            showSidebar(d);
+          });
+
+        g.append("text")
+          .attr("y", 40)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#fff")
+          .style("font-size", "12px")
+          .text(d => d.label);
+
+        return g;
+      }
+    );
+
+    simulation.nodes(nodes);
+    simulation.force("link").links(links);
+    simulation.alpha(1).restart();
+
+    simulation.on("tick", () => {
+      nodeSelection.attr("transform", d => `translate(${d.x},${d.y})`);
+      linkSelection
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+    });
+  }
+
+  function revealChildren(parentNode) {
+    parentNode._expanded = true;
+
+    const newNodes = parentNode.children || [];
+    const newLinks = newNodes.map(child => ({
+      source: parentNode.id,
+      target: child.id
+    }));
+
+    nodes.push(...newNodes);
+    links.push(...newLinks);
+
+    // Update selections
+    nodeSelection = nodeGroup.selectAll("g").data(nodes, d => d.id);
+    linkSelection = linkGroup.selectAll("line").data(links, d => `${d.source}-${d.target}`);
+    draw();
+  }
 }
 
-// Drag behavior
 function drag(simulation) {
   return d3.drag()
     .on("start", (event, d) => {
@@ -99,7 +125,6 @@ function drag(simulation) {
     });
 }
 
-// Sidebar logic
 function showSidebar(d) {
   const sidebar = document.getElementById("sidebar");
   const content = document.getElementById("content");
@@ -115,7 +140,6 @@ function showSidebar(d) {
   `;
 }
 
-// Sidebar toggles
 document.getElementById("closeBtn").onclick = () =>
   document.getElementById("sidebar").classList.remove("open");
 
