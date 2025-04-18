@@ -195,7 +195,7 @@ body {
     border-radius: 6px;
   }
   #chatHistory {
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     font-size: 0.9rem;
     margin-bottom: 1rem;
