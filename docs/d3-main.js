@@ -3,6 +3,9 @@ fetch('data/pipeline.json')
   .then(data => initGraph(data.steps));
 
 function initGraph(stepsData) {
+  const colorByDepth = d3.scaleOrdinal()
+    .domain([0, 1, 2])
+    .range(["#3b82f6", "#9333ea", "#ec4899"]);
   const width = window.innerWidth;
   const height = window.innerHeight;
 
@@ -47,42 +50,39 @@ function initGraph(stepsData) {
   function draw() {
     linkSelection = linkSelection.join("line")
       .attr("marker-end", "url(#arrowhead)");
-
+  
     nodeSelection = nodeSelection.join(
       enter => {
         const g = enter.append("g").attr("class", "node").call(drag(simulation));
-
-
-        const colorByDepth = d3.scaleOrdinal()
-            .domain([0, 1, 2])
-            .range(["#3b82f6", "#9333ea", "#ec4899"]);
+  
         g.append("circle")
           .attr("r", 24)
-          .attr("fill", d => colorByDepth(d.depth ?? 0))
           .attr("stroke", "#fff")
           .attr("stroke-width", 2)
           .on("click", (_, d) => {
-            if (d.children) {
-              toggleChildren(d);
-            }
+            if (d.children) toggleChildren(d);
             showSidebar(d);
           });
-
+  
         g.append("text")
           .attr("y", 40)
           .attr("text-anchor", "middle")
           .attr("fill", "#fff")
           .style("font-size", "12px")
           .text(d => d.label);
-
+  
         return g;
       }
     );
-
+  
+    // ✅ Apply dynamic color to ALL node circles (not just new ones)
+    nodeSelection.select("circle")
+      .attr("fill", d => colorByDepth(d.depth ?? 0));
+  
     simulation.nodes(nodes);
     simulation.force("link").links(links);
     simulation.alpha(1).restart();
-
+  
     simulation.on("tick", () => {
       nodeSelection.attr("transform", d => `translate(${d.x},${d.y})`);
       linkSelection
@@ -92,6 +92,7 @@ function initGraph(stepsData) {
         .attr("y2", d => d.target.y);
     });
   }
+  
 
 
   function toggleChildren(parentNode) {
