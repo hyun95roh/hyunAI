@@ -57,8 +57,8 @@ function initGraph(stepsData) {
           .attr("stroke", "#fff")
           .attr("stroke-width", 2)
           .on("click", (_, d) => {
-            if (d.children && !d._expanded) {
-              revealChildren(d);
+            if (d.children) {
+              toggleChildren(d);
             }
             showSidebar(d);
           });
@@ -88,23 +88,46 @@ function initGraph(stepsData) {
     });
   }
 
-  function revealChildren(parentNode) {
-    parentNode._expanded = true;
 
-    const newNodes = parentNode.children || [];
-    const newLinks = newNodes.map(child => ({
-      source: parentNode.id,
-      target: child.id
-    }));
-
-    nodes.push(...newNodes);
-    links.push(...newLinks);
-
-    // Update selections
+  function toggleChildren(parentNode) {
+    if (!parentNode.children) return;
+  
+    if (parentNode._expanded) {
+      // Collapse: remove child nodes & links
+      const childIds = new Set(parentNode.children.map(c => c.id));
+  
+      nodes = nodes.filter(n => !childIds.has(n.id));
+      links = links.filter(l =>
+        !childIds.has(typeof l.target === 'object' ? l.target.id : l.target)
+      );
+  
+      parentNode._expanded = false;
+    } else {
+      // Expand again
+      const newNodes = parentNode.children;
+      const newLinks = newNodes.map(child => ({
+        source: parentNode.id,
+        target: child.id
+      }));
+  
+      nodes.push(...newNodes);
+      links.push(...newLinks);
+  
+      parentNode._expanded = true;
+    }
+  
+    // Rebind and redraw
     nodeSelection = nodeGroup.selectAll("g").data(nodes, d => d.id);
-    linkSelection = linkGroup.selectAll("line").data(links, d => `${d.source}-${d.target}`);
+    linkSelection = linkGroup.selectAll("line").data(links, d => `${lKey(l)}`);
     draw();
   }
+  
+  // Unique key for link data join
+  function lKey(link) {
+    const s = typeof link.source === "object" ? link.source.id : link.source;
+    const t = typeof link.target === "object" ? link.target.id : link.target;
+    return `${s}-${t}`;
+  }  
 }
 
 function drag(simulation) {
