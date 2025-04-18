@@ -30,7 +30,6 @@ function initGraph(stepsData) {
   let nodes = stepsData.map(d => ({ ...d, depth: 0 }));
   window.allNodes = stepsData.flatMap(d => [d, ...(d.children || [])]);
 
-  // only main nodes initially
   let links = stepsData.slice(0, -1).map((d, i) => ({
     source: d.id,
     target: stepsData[i + 1].id
@@ -77,7 +76,6 @@ function initGraph(stepsData) {
       }
     );
   
-    // ✅ Apply dynamic color to ALL node circles (not just new ones)
     nodeSelection.select("circle")
       .attr("fill", d => colorByDepth(d.depth ?? 0));
   
@@ -94,14 +92,11 @@ function initGraph(stepsData) {
         .attr("y2", d => d.target.y);
     });
   }
-  
-
 
   function toggleChildren(parentNode) {
     if (!parentNode.children) return;
   
     if (parentNode._expanded) {
-      // Collapse: remove child nodes & links
       const childIds = new Set(parentNode.children.map(c => c.id));
       nodes = nodes.filter(n => !childIds.has(n.id));
       links = links.filter(l =>
@@ -109,7 +104,6 @@ function initGraph(stepsData) {
       );
       parentNode._expanded = false;
     } else {
-      // Expand
       const newNodes = parentNode.children.map(child => ({ ...child, depth: 1 }));
       const newLinks = newNodes.map(child => ({
         source: parentNode.id,
@@ -119,23 +113,19 @@ function initGraph(stepsData) {
       links.push(...newLinks);
       parentNode._expanded = true;
     }
-  
-    // ⬇️ Corrected usage of lKey()
+
     nodeSelection = nodeGroup.selectAll("g").data(nodes, d => d.id);
     linkSelection = linkGroup.selectAll("line").data(links, l => lKey(l));
     draw();
   }
-  
-  
-  // Unique key for link data join
+
   function lKey(link) {
     const s = typeof link.source === "object" ? link.source.id : link.source;
     const t = typeof link.target === "object" ? link.target.id : link.target;
     return `${s}-${t}`;
-  }  
+  }
 }
 
-// Drag behavior for nodes
 function drag(simulation) {
   return d3.drag()
     .on("start", (event, d) => {
@@ -154,112 +144,104 @@ function drag(simulation) {
     });
 }
 
-// Sidebar: auto-show on node click
+// Sidebar handlers
 const sidebar = document.getElementById("sidebar");
 function showSidebar(d) {
-    const content = document.getElementById("content");
-    sidebar.classList.remove("closed");  // ⬅️ Always open when a node is clicked
-  
-    content.innerHTML = `
-      <h2>${d.label}</h2>
-      ${marked.parse(d.desc || "*Coming soon*")}
-      ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
-      ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
-        `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
-      ).join("")}</ul>` : ""}
-    `;
-  }
+  const content = document.getElementById("content");
+  sidebar.classList.remove("closed");
+  content.innerHTML = `
+    <h2>${d.label}</h2>
+    ${marked.parse(d.desc || "*Coming soon*")}
+    ${d.code ? `<h3>Code Snippet</h3><pre><code>${d.code}</code></pre>` : ""}
+    ${d.links?.length ? `<h3>Articles</h3><ul>${d.links.map(l =>
+      `<li><a href="${l.url}" target="_blank">${l.text}</a></li>`
+    ).join("")}</ul>` : ""}
+  `;
+}
 
-// Sidebar: toggle visibility
-const toggleBtn = document.getElementById("toggleBtn");
-const closeBtn = document.getElementById("closeBtn");
-toggleBtn.onclick = () => {
-sidebar.classList.toggle("closed");  // ⬅️ Use 'closed' class
-};
+document.getElementById("toggleBtn").onclick = () =>
+  sidebar.classList.toggle("closed");
+document.getElementById("closeBtn").onclick = () =>
+  sidebar.classList.add("closed");
 
-closeBtn.onclick = () => {
-sidebar.classList.add("closed");     // ⬅️ Force hide
-};
-
-// Resizable right sidebar
+// Resizers and togglers
 const resizer = document.getElementById("resizer");
-let isResizing = false;
+const leftSidebar = document.getElementById("left-sidebar");
+const leftResizer = document.getElementById("leftResizer");
+const leftToggleBtn = document.getElementById("leftToggleBtn");
 
-resizer.addEventListener("mousedown", e => {
+let isResizing = false;
+let isResizingLeft = false;
+
+resizer.addEventListener("mousedown", () => {
   isResizing = true;
   document.body.style.cursor = "ew-resize";
   document.body.style.userSelect = "none";
 });
 
-document.addEventListener("mousemove", e => {
-  if (!isResizing) return;
-  const newWidth = window.innerWidth - e.clientX;
-  sidebar.style.width = `${Math.max(newWidth, 200)}px`; // min width = 200px
+leftResizer.addEventListener("mousedown", () => {
+  isResizingLeft = true;
+  document.body.style.cursor = "ew-resize";
+  document.body.style.userSelect = "none";
+});
+
+document.addEventListener("mousemove", (e) => {
+  if (isResizing) {
+    const newWidth = window.innerWidth - e.clientX;
+    sidebar.style.width = `${Math.max(newWidth, 200)}px`;
+  }
+  if (isResizingLeft) {
+    const newWidth = e.clientX;
+    if (newWidth > 200 && newWidth < 600) {
+      leftSidebar.style.width = `${newWidth}px`;
+      leftToggleBtn.style.left = `${newWidth}px`;
+    }
+  }
 });
 
 document.addEventListener("mouseup", () => {
-  if (isResizing) {
+  if (isResizing || isResizingLeft) {
     isResizing = false;
+    isResizingLeft = false;
     document.body.style.cursor = "";
     document.body.style.userSelect = "";
   }
 });
 
-// Resizable left sidebar
-const leftSidebar = document.getElementById("left-sidebar");
-const leftResizer = document.getElementById("leftResizer");
-const leftToggleBtn = document.getElementById("leftToggleBtn");
-let isLeftResizing = false;
-
-
-// Close button for left sidebar
-document.getElementById("leftToggleBtn").onclick = () => {
-    leftSidebar.classList.toggle("closed");
-  };
-  
-// Resizing
-leftResizer.addEventListener("mousedown", e => {
-  isLeftResizing = true;
-  document.body.style.cursor = "ew-resize";
+leftToggleBtn.addEventListener('click', () => {
+  const isClosed = leftSidebar.classList.toggle('closed');
+  if (isClosed) {
+    leftToggleBtn.style.left = '0px';
+    leftToggleBtn.textContent = '⮞';
+  } else {
+    const width = leftSidebar.offsetWidth;
+    leftToggleBtn.style.left = `${width}px`;
+    leftToggleBtn.textContent = '⮜';
+  }
 });
 
-document.addEventListener("mousemove", e => {
-  if (!isLeftResizing || leftSidebar.classList.contains("closed")) return;
-  const newWidth = e.clientX;
-  leftSidebar.style.width = `${Math.max(newWidth, 200)}px`;
-  leftToggleBtn.style.left = `${Math.max(newWidth, 200)}px`;
-});
-
-document.addEventListener("mouseup", () => {
-  isLeftResizing = false;
-  document.body.style.cursor = "";
-});
-
-
-// TAB SWITCHING (left sidebar)
+// Tab logic
 document.querySelectorAll("#left-sidebar .tab").forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll("#left-sidebar .tab").forEach(b => b.classList.remove("active"));
-      document.querySelectorAll("#left-sidebar .tab-content").forEach(t => t.classList.add("hidden"));
-      btn.classList.add("active");
-      document.getElementById(`${btn.dataset.tab}-tab`).classList.remove("hidden");
-    };
-  });
-  
+  btn.onclick = () => {
+    document.querySelectorAll("#left-sidebar .tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll("#left-sidebar .tab-content").forEach(t => t.classList.add("hidden"));
+    btn.classList.add("active");
+    document.getElementById(`${btn.dataset.tab}-tab`).classList.remove("hidden");
+  };
+});
 
-// Search functionality 
+// Search
 window.onload = () => {
   document.getElementById("searchBox").addEventListener("input", e => {
     const query = e.target.value.toLowerCase();
     const keywords = query.split(/\s+/).filter(Boolean);
     const resultBox = document.getElementById("searchResults");
 
-    const matches = (window.allNodes || []).filter(n => { //Filter nodes based on input
+    const matches = (window.allNodes || []).filter(n => {
       const label = n.label?.toLowerCase() || "";
       return keywords.every(kw => label.includes(kw));
     }).slice(0, 10);
 
-    // highlight keywords in results
     resultBox.innerHTML = matches.map(m => {
       let label = m.label;
       keywords.forEach(kw => {
@@ -270,9 +252,8 @@ window.onload = () => {
     }).join("") || "<em>No results</em>";
   });
 
-  // Add click event to search results
-  document.getElementById("searchResults").addEventListener("click", e => { 
-    if (e.target.classList.contains("result")) { 
+  document.getElementById("searchResults").addEventListener("click", e => {
+    if (e.target.classList.contains("result")) {
       const id = e.target.dataset.id;
       const targetNode = window.allNodes.find(n => n.id == id);
       if (targetNode) showSidebar(targetNode);
@@ -280,8 +261,7 @@ window.onload = () => {
   });
 };
 
-
-// Chat functionality - Send message and get response
+// Chat
 const historyEl = document.getElementById("chatHistory");
 
 document.getElementById("chatSend").onclick = async () => {
@@ -300,7 +280,7 @@ document.getElementById("chatSend").onclick = async () => {
       body: JSON.stringify({ message: input })
     });
     const data = await res.json();
-    out.innerHTML = "";  // Clear final output box
+    out.innerHTML = "";
     historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>GPT:</strong> ${marked.parse(data.reply)}</div>`;
   } catch (err) {
     out.innerHTML = `<span style="color:red">❌ Chat failed</span>`;
@@ -308,6 +288,3 @@ document.getElementById("chatSend").onclick = async () => {
 
   historyEl.scrollTop = historyEl.scrollHeight;
 };
-
-  
-  
