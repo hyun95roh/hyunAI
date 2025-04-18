@@ -24,7 +24,7 @@ app.post('/chat', async (req, res) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",  // for looking around model choice: https://console.groq.com/docs/models
+        model: "llama3-70b-8192",  // for looking around model choice: https://console.groq.com/docs/models
         messages: [
           { role: "system", content: "You are a helpful assistant for machine learning pipelines." },
           { role: "user", content: message }

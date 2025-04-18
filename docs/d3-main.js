@@ -312,12 +312,12 @@ async function sendChatMessage() {
     });
     const data = await res.json();
     out.innerHTML = "";
-    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>Llama-4:</strong> ${marked.parse(data.reply)}</div>`;
+    historyEl.innerHTML += `<div class="chat-bot">🤖 <strong>Llama:</strong> ${marked.parse(data.reply)}</div>`;
   } catch (err) {
     out.innerHTML = `<span style="color:red">❌ Chat failed</span>`;
   } finally {
     sendBtn.disabled = false;
-    sendBtn.textContent = "Ask Llama-4";
+    sendBtn.textContent = "Ask Llama";
     historyEl.scrollTop = historyEl.scrollHeight;
   }
 }
